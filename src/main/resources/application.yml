@@ -1,1 +1,8 @@
-spring.application.name=prosto-learn
+spring:
+  application:
+    name: prosto-learn
+  datasource:
+    username:
+    password:
+    url:
+
