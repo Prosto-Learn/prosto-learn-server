@@ -11,6 +11,7 @@ import com.nhavronskyi.prostolearn.lessons.dto.Lesson;
 import com.nhavronskyi.prostolearn.lessons.service.LessonService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("lesson")
@@ -19,11 +20,12 @@ public class LessonController {
     private final LessonService lessonService;
 
     @PostMapping
-    void save(@RequestBody Lesson lesson){
+    void save(@RequestBody Lesson lesson) {
         lessonService.save(lesson);
     }
 
-    List<Lesson> getLessons(){
+    @GetMapping
+    List<Lesson> getLessons() {
         return lessonService.getLessons();
     }
 }

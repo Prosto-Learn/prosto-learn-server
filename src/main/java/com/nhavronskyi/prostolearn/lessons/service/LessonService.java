@@ -13,12 +13,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LessonService {
     private final LessonsRepository repository;
-    
-    public void save(Lesson lesson){
+
+    public void save(Lesson lesson) {
         repository.save(lesson);
     }
 
-    public List<Lesson> getLessons(){
+    public List<Lesson> getLessons() {
         return repository.findAll();
     }
 }
