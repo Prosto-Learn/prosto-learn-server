@@ -1,8 +1,7 @@
 package com.nhavronskyi.prostolearn.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +14,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Teacher {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-    @OneToMany(mappedBy = "teachers")
+    @OneToMany(mappedBy = "teacher")
+    @JsonManagedReference
     private List<Lesson> lessons;
 }
