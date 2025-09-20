@@ -14,12 +14,12 @@ public class TeacherController {
     private final TeacherService teacherService;
 
     @GetMapping
-    List<Teacher> getAll(){
+    List<Teacher> getAll() {
         return teacherService.getTeachers();
     }
 
     @PostMapping
-    void saveTeacher(@RequestBody Teacher teacher){
+    void saveTeacher(@RequestBody Teacher teacher) {
         teacherService.saveTeacher(teacher);
     }
 }
