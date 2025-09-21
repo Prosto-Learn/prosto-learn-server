@@ -1,0 +1,30 @@
+package com.nhavronskyi.prostolearn.dto;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.Set;
+
+@Data
+@Entity(name = "timetable")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Timetable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private LocalTime startTime;
+    private LocalTime endTime;
+
+    private Set<DayOfWeek> workingDays;
+}
