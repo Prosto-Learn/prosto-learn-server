@@ -9,6 +9,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -52,24 +54,48 @@ class LessonServiceTest {
     @Order(2)
     @Transactional
     void createLesson() {
-        LocalDateTime lessonStart = LocalDateTime.of(getNext(DayOfWeek.MONDAY), LocalTime.of(10, 0));
+        Lesson test = getLesson(DayOfWeek.MONDAY, "test");
+
+        lessonService.save(test);
+
+        Lesson saving = lessonService.getLessonsByTeacher(1L).getFirst();
+
+        Assertions.assertEquals(test, saving);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "MONDAY, true",
+            "WEDNESDAY, false"
+    })
+    @Order(3)
+    @Transactional
+    void shouldSaveOnlyInWorkingDays(DayOfWeek dayOfWeek, boolean status){
+        Lesson lesson = getLesson(dayOfWeek, dayOfWeek.name());
+        lessonService.save(lesson);
+
+        List<Lesson> lessons = lessonService.getLessonsByTeacher(1L);
+
+        Assertions.assertEquals(status, lessons.contains(lesson));
+    }
+
+    private static Lesson getLesson(DayOfWeek dayOfWeek, String name) {
+        LocalDateTime lessonStart = LocalDateTime.of(getNext(dayOfWeek), LocalTime.of(10, 0));
         LocalDateTime lessonEnd = lessonStart.plusHours(1);
 
         Lesson test = new Lesson();
-        test.setName("test");
+        test.setName(name);
         test.setStartTime(lessonStart);
         test.setEndTime(lessonEnd);
         Teacher teacher = new Teacher();
         teacher.setId(1L);
         test.setTeacher(teacher);
-        Lesson save = lessonService.save(test);
-
-        Assertions.assertEquals(test, save);
+        return test;
     }
 
 
     private static LocalDate getNext(DayOfWeek dayOfWeek) {
         LocalDate today = LocalDate.now();
-        return today.with(TemporalAdjusters.nextOrSame(dayOfWeek));
+        return today.with(TemporalAdjusters.next(dayOfWeek));
     }
 }

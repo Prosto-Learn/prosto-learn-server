@@ -2,7 +2,10 @@ package com.nhavronskyi.prostolearn.service;
 
 import com.nhavronskyi.prostolearn.dto.Lesson;
 import com.nhavronskyi.prostolearn.dto.Teacher;
+import com.nhavronskyi.prostolearn.dto.Timetable;
 import com.nhavronskyi.prostolearn.repository.LessonsRepository;
+import com.nhavronskyi.prostolearn.repository.TimetableRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,25 +16,31 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LessonService {
     private final LessonsRepository lessonsRepository;
+    private final TimetableRepository timetableRepository;
 
     public Lesson save(Lesson lesson) {
-        if (lesson.isTimeValid() && !isLessonIsOverlapped(lesson)) {
+        Timetable timetable = timetableRepository.findById(lesson.getTeacher().getId()).orElseThrow(NullPointerException::new);
+        if (timetable.isInWorkingDays(lesson) && lesson.isTimeValid() && !isLessonIsOverlapped(lesson)) {
             return lessonsRepository.save(lesson);
         }
         return null;
     }
 
     private boolean isLessonIsOverlapped(Lesson lesson) {
-        Long id = Optional.ofNullable(lesson)
+        List<Lesson> lessonsByTeacherId = Optional.ofNullable(lesson)
                 .map(Lesson::getTeacher)
                 .map(Teacher::getId)
+                .map(this::getLessonsByTeacher)
                 .orElseThrow(NullPointerException::new);
-        List<Lesson> lessonsByTeacherId = lessonsRepository.findLessonsByTeacherId(id);
         return !lessonsByTeacherId.isEmpty() && lessonsByTeacherId.stream()
                 .noneMatch(less -> less.isOverlapped(lesson));
     }
 
     public List<Lesson> getLessons() {
         return lessonsRepository.findAll();
+    }
+
+    public List<Lesson> getLessonsByTeacher(Long id) {
+        return lessonsRepository.findLessonsByTeacherId(id);
     }
 }
