@@ -22,6 +22,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class LessonServiceTest {
@@ -47,7 +49,7 @@ class LessonServiceTest {
     @Test
     @Order(1)
     void teacherShouldExist() {
-        Assertions.assertFalse(teacherService.getTeachers().isEmpty());
+        assertFalse(teacherService.getTeachers().isEmpty());
     }
 
     @Test
@@ -60,7 +62,7 @@ class LessonServiceTest {
 
         Lesson saving = lessonService.getLessonsByTeacher(1L).getFirst();
 
-        Assertions.assertEquals(test, saving);
+        assertEquals(test, saving);
     }
 
     @ParameterizedTest
@@ -70,17 +72,38 @@ class LessonServiceTest {
     })
     @Order(3)
     @Transactional
-    void shouldSaveOnlyInWorkingDays(DayOfWeek dayOfWeek, boolean status){
+    void shouldSaveOnlyInWorkingDays(DayOfWeek dayOfWeek, boolean status) {
         Lesson lesson = getLesson(dayOfWeek, dayOfWeek.name());
         lessonService.save(lesson);
 
         List<Lesson> lessons = lessonService.getLessonsByTeacher(1L);
 
-        Assertions.assertEquals(status, lessons.contains(lesson));
+        assertEquals(status, lessons.contains(lesson));
     }
 
-    private static Lesson getLesson(DayOfWeek dayOfWeek, String name) {
-        LocalDateTime lessonStart = LocalDateTime.of(getNext(dayOfWeek), LocalTime.of(10, 0));
+    @Order(4)
+    @ParameterizedTest
+    @CsvSource({
+            "11:00, true",
+            "17:00, true",
+            "08:00, false",
+            "18:00, false",
+            "22:00, false"
+    })
+    @Transactional
+    void shouldSaveOnlyInWorkingHours(LocalTime start, boolean status){
+        DayOfWeek dayOfWeek = DayOfWeek.MONDAY;
+        Lesson lesson = getLesson(dayOfWeek, start, dayOfWeek.name());
+
+        lessonService.save(lesson);
+
+        List<Lesson> lessons = lessonService.getLessonsByTeacher(1L);
+
+        assertEquals(status, lessons.contains(lesson));
+    }
+
+    private static Lesson getLesson(DayOfWeek dayOfWeek, LocalTime localTime, String name){
+        LocalDateTime lessonStart = LocalDateTime.of(getNext(dayOfWeek), localTime);
         LocalDateTime lessonEnd = lessonStart.plusHours(1);
 
         Lesson test = new Lesson();
@@ -91,6 +114,10 @@ class LessonServiceTest {
         teacher.setId(1L);
         test.setTeacher(teacher);
         return test;
+    }
+
+    private static Lesson getLesson(DayOfWeek dayOfWeek, String name) {
+        return getLesson(dayOfWeek, LocalTime.of(10, 0) ,name);
     }
 
 

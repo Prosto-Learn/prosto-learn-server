@@ -19,14 +19,18 @@ public class LessonService {
     private final TimetableRepository timetableRepository;
 
     public Lesson save(Lesson lesson) {
-        Timetable timetable = timetableRepository.findById(lesson.getTeacher().getId()).orElseThrow(NullPointerException::new);
-        if (timetable.isInWorkingDays(lesson) && lesson.isTimeValid() && !isLessonIsOverlapped(lesson)) {
+        Timetable timetable = timetableRepository.findById(lesson.getTeacher().getId())
+                .orElseThrow(NullPointerException::new);
+        if (timetable.isInWorkingDays(lesson)
+            && timetable.isInWorkingHours(lesson)
+            && lesson.isTimeValid()
+            && !isLessonOverlapped(lesson)) {
             return lessonsRepository.save(lesson);
         }
         return null;
     }
 
-    private boolean isLessonIsOverlapped(Lesson lesson) {
+    private boolean isLessonOverlapped(Lesson lesson) {
         List<Lesson> lessonsByTeacherId = Optional.ofNullable(lesson)
                 .map(Lesson::getTeacher)
                 .map(Teacher::getId)

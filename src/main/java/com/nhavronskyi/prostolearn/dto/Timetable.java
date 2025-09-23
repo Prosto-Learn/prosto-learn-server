@@ -28,7 +28,11 @@ public class Timetable {
 
     private Set<DayOfWeek> workingDays;
 
-    public boolean isInWorkingDays(Lesson lesson){
-        return  workingDays.contains(lesson.getStartTime().getDayOfWeek()) && workingDays.contains(lesson.getEndTime().getDayOfWeek());
+    public boolean isInWorkingDays(Lesson lesson) {
+        return workingDays.contains(lesson.getStartTime().getDayOfWeek()) && workingDays.contains(lesson.getEndTime().getDayOfWeek());
+    }
+
+    public boolean isInWorkingHours(Lesson lesson) {
+        return lesson.getStartTime().toLocalTime().isAfter(startTime.minusMinutes(1)) && lesson.getEndTime().toLocalTime().isBefore(endTime.plusMinutes(1));
     }
 }
