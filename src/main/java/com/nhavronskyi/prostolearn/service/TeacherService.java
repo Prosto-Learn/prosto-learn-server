@@ -12,11 +12,11 @@ import java.util.List;
 public class TeacherService {
     private final TeacherRepository teacherRepository;
 
-    public List<Teacher> getTeachers(){
+    public List<Teacher> getTeachers() {
         return teacherRepository.findAll();
     }
 
-    public void saveTeacher(Teacher teacher){
+    public void saveTeacher(Teacher teacher) {
         teacherRepository.save(teacher);
     }
 }

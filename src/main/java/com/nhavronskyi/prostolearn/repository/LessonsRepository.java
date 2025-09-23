@@ -1,7 +1,7 @@
 package com.nhavronskyi.prostolearn.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import com.nhavronskyi.prostolearn.dto.Lesson;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;

@@ -1,39 +1,49 @@
 package com.nhavronskyi.prostolearn.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.nhavronskyi.prostolearn.dto.Lesson;
 import com.nhavronskyi.prostolearn.dto.Teacher;
+import com.nhavronskyi.prostolearn.dto.Timetable;
+import com.nhavronskyi.prostolearn.repository.LessonsRepository;
+import com.nhavronskyi.prostolearn.repository.TimetableRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import com.nhavronskyi.prostolearn.dto.Lesson;
-import com.nhavronskyi.prostolearn.repository.LessonsRepository;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class LessonService {
     private final LessonsRepository lessonsRepository;
+    private final TimetableRepository timetableRepository;
 
     public Lesson save(Lesson lesson) {
-        if(lesson.isTimeValid() && !isLessonIsOverlapped(lesson)) {
+        Timetable timetable = timetableRepository.findById(lesson.getTeacher().getId())
+                .orElseThrow(NullPointerException::new);
+        if (timetable.isInWorkingDays(lesson)
+            && timetable.isInWorkingHours(lesson)
+            && lesson.isTimeValid()
+            && !isLessonOverlapped(lesson)) {
             return lessonsRepository.save(lesson);
         }
         return null;
     }
 
-    private boolean isLessonIsOverlapped(Lesson lesson){
-        Long id = Optional.ofNullable(lesson)
+    private boolean isLessonOverlapped(Lesson lesson) {
+        List<Lesson> lessonsByTeacherId = Optional.ofNullable(lesson)
                 .map(Lesson::getTeacher)
                 .map(Teacher::getId)
+                .map(this::getLessonsByTeacher)
                 .orElseThrow(NullPointerException::new);
-        List<Lesson> lessonsByTeacherId = lessonsRepository.findLessonsByTeacherId(id);
         return !lessonsByTeacherId.isEmpty() && lessonsByTeacherId.stream()
                 .noneMatch(less -> less.isOverlapped(lesson));
     }
 
     public List<Lesson> getLessons() {
         return lessonsRepository.findAll();
+    }
+
+    public List<Lesson> getLessonsByTeacher(Long id) {
+        return lessonsRepository.findLessonsByTeacherId(id);
     }
 }
