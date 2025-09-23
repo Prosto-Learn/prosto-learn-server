@@ -4,7 +4,6 @@ import com.nhavronskyi.prostolearn.dto.Lesson;
 import com.nhavronskyi.prostolearn.dto.Teacher;
 import com.nhavronskyi.prostolearn.dto.Timetable;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -31,6 +31,29 @@ class LessonServiceTest {
     private LessonService lessonService;
     @Autowired
     private TeacherService teacherService;
+
+    private static Lesson getLesson(DayOfWeek dayOfWeek, LocalTime localTime, String name) {
+        LocalDateTime lessonStart = LocalDateTime.of(getNext(dayOfWeek), localTime);
+        LocalDateTime lessonEnd = lessonStart.plusHours(1);
+
+        Lesson test = new Lesson();
+        test.setName(name);
+        test.setStartTime(lessonStart);
+        test.setEndTime(lessonEnd);
+        Teacher teacher = new Teacher();
+        teacher.setId(1L);
+        test.setTeacher(teacher);
+        return test;
+    }
+
+    private static Lesson getLesson(DayOfWeek dayOfWeek, String name) {
+        return getLesson(dayOfWeek, LocalTime.of(10, 0), name);
+    }
+
+    private static LocalDate getNext(DayOfWeek dayOfWeek) {
+        LocalDate today = LocalDate.now();
+        return today.with(TemporalAdjusters.next(dayOfWeek));
+    }
 
     @Test
     @Order(0)
@@ -91,7 +114,7 @@ class LessonServiceTest {
             "22:00, false"
     })
     @Transactional
-    void shouldSaveOnlyInWorkingHours(LocalTime start, boolean status){
+    void shouldSaveOnlyInWorkingHours(LocalTime start, boolean status) {
         DayOfWeek dayOfWeek = DayOfWeek.MONDAY;
         Lesson lesson = getLesson(dayOfWeek, start, dayOfWeek.name());
 
@@ -100,29 +123,5 @@ class LessonServiceTest {
         List<Lesson> lessons = lessonService.getLessonsByTeacher(1L);
 
         assertEquals(status, lessons.contains(lesson));
-    }
-
-    private static Lesson getLesson(DayOfWeek dayOfWeek, LocalTime localTime, String name){
-        LocalDateTime lessonStart = LocalDateTime.of(getNext(dayOfWeek), localTime);
-        LocalDateTime lessonEnd = lessonStart.plusHours(1);
-
-        Lesson test = new Lesson();
-        test.setName(name);
-        test.setStartTime(lessonStart);
-        test.setEndTime(lessonEnd);
-        Teacher teacher = new Teacher();
-        teacher.setId(1L);
-        test.setTeacher(teacher);
-        return test;
-    }
-
-    private static Lesson getLesson(DayOfWeek dayOfWeek, String name) {
-        return getLesson(dayOfWeek, LocalTime.of(10, 0) ,name);
-    }
-
-
-    private static LocalDate getNext(DayOfWeek dayOfWeek) {
-        LocalDate today = LocalDate.now();
-        return today.with(TemporalAdjusters.next(dayOfWeek));
     }
 }

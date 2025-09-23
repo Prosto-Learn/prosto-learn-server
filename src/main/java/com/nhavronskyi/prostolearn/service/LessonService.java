@@ -5,7 +5,6 @@ import com.nhavronskyi.prostolearn.dto.Teacher;
 import com.nhavronskyi.prostolearn.dto.Timetable;
 import com.nhavronskyi.prostolearn.repository.LessonsRepository;
 import com.nhavronskyi.prostolearn.repository.TimetableRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
