@@ -28,6 +28,9 @@ public class Lesson {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private Teacher teacher;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    private Student student;
 
     public boolean isOverlapped(Lesson lesson) {
         return (lesson.getStartTime().isBefore(startTime) && lesson.getEndTime().isBefore(startTime.plusMinutes(1))) ||
