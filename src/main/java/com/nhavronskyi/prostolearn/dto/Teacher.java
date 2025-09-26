@@ -30,4 +30,10 @@ public class Teacher {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "teacher_id")
     private Timetable timetable;
+
+    public static Teacher withId(Long id) {
+        Teacher teacher = new Teacher();
+        teacher.setId(id);
+        return teacher;
+    }
 }
