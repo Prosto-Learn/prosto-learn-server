@@ -28,7 +28,7 @@ public class Teacher {
     @JsonManagedReference
     private List<Lesson> lessons;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(name = "teacher")
     private Timetable timetable;
 
     public static Teacher withId(Long id) {

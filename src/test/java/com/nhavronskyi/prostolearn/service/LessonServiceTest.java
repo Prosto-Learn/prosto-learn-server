@@ -1,6 +1,7 @@
 package com.nhavronskyi.prostolearn.service;
 
 import com.nhavronskyi.prostolearn.dto.Lesson;
+import com.nhavronskyi.prostolearn.dto.Student;
 import com.nhavronskyi.prostolearn.dto.Teacher;
 import com.nhavronskyi.prostolearn.dto.Timetable;
 import jakarta.transaction.Transactional;
@@ -31,6 +32,8 @@ class LessonServiceTest {
     private LessonService lessonService;
     @Autowired
     private TeacherService teacherService;
+    @Autowired
+    private StudentService studentService;
 
     private static Lesson getLesson(DayOfWeek dayOfWeek, LocalTime localTime, String name) {
         LocalDateTime lessonStart = LocalDateTime.of(getNext(dayOfWeek), localTime);
@@ -40,9 +43,10 @@ class LessonServiceTest {
         test.setName(name);
         test.setStartTime(lessonStart);
         test.setEndTime(lessonEnd);
-        Teacher teacher = new Teacher();
-        teacher.setId(1L);
+        Teacher teacher = Teacher.withId(1L);
+        Student student = Student.withId(1L);
         test.setTeacher(teacher);
+        test.setStudent(student);
         return test;
     }
 

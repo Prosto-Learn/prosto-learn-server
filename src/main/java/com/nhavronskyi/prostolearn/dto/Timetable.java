@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +28,9 @@ public class Timetable {
     private LocalTime endTime;
 
     private Set<DayOfWeek> workingDays;
+
+    @OneToOne(mappedBy = "timetable")
+    private Teacher teacher;
 
     public boolean isInWorkingDays(Lesson lesson) {
         return workingDays.contains(lesson.getStartTime().getDayOfWeek()) && workingDays.contains(lesson.getEndTime().getDayOfWeek());
